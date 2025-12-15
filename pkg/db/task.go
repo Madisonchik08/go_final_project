@@ -1,5 +1,11 @@
 package db
 
+import (
+	"database/sql"
+	"strings"
+	"time"
+)
+
 // Task represents a scheduler record.
 type Task struct {
 	ID      int64  `db:"id" json:"id,string"`
@@ -20,11 +26,30 @@ func AddTask(task *Task) (int64, error) {
 }
 
 // Tasks returns up to limit tasks ordered by date ascending.
-func Tasks(limit int) ([]*Task, error) {
+// If search is provided, filters by date (dd.mm.yyyy) or substring in title/comment.
+func Tasks(limit int, search string) ([]*Task, error) {
 	if limit <= 0 {
 		limit = 50
 	}
-	rows, err := DB.Query(`SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date LIMIT ?`, limit)
+
+	search = strings.TrimSpace(search)
+
+	var (
+		rows *sql.Rows
+		err  error
+	)
+
+	if search == "" {
+		rows, err = DB.Query(`SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date LIMIT ?`, limit)
+	} else {
+		if d, derr := time.Parse("02.01.2006", search); derr == nil {
+			searchDate := d.Format("20060102")
+			rows, err = DB.Query(`SELECT id, date, title, comment, repeat FROM scheduler WHERE date = ? ORDER BY date LIMIT ?`, searchDate, limit)
+		} else {
+			pattern := "%" + search + "%"
+			rows, err = DB.Query(`SELECT id, date, title, comment, repeat FROM scheduler WHERE title LIKE ? OR comment LIKE ? ORDER BY date LIMIT ?`, pattern, pattern, limit)
+		}
+	}
 	if err != nil {
 		return nil, err
 	}

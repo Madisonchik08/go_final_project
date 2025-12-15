@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"go_final_project/pkg/api"
 )
 
 const (
@@ -39,6 +41,7 @@ func Start() error {
 	dir := resolveWebDir()
 
 	mux := http.NewServeMux()
+	api.Init(mux)
 	mux.Handle("/", http.FileServer(http.Dir(dir)))
 
 	addr := fmt.Sprintf(":%d", resolvePort())

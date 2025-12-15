@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -67,4 +68,32 @@ func Tasks(limit int, search string) ([]*Task, error) {
 		tasks = []*Task{}
 	}
 	return tasks, nil
+}
+
+// GetTask returns task by id.
+func GetTask(id string) (*Task, error) {
+	var t Task
+	err := DB.QueryRow(`SELECT id, date, title, comment, repeat FROM scheduler WHERE id = ?`, id).
+		Scan(&t.ID, &t.Date, &t.Title, &t.Comment, &t.Repeat)
+	if err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
+// UpdateTask updates task fields by id.
+func UpdateTask(task *Task) error {
+	query := `UPDATE scheduler SET date = ?, title = ?, comment = ?, repeat = ? WHERE id = ?`
+	res, err := DB.Exec(query, task.Date, task.Title, task.Comment, task.Repeat, task.ID)
+	if err != nil {
+		return err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return fmt.Errorf("task not found")
+	}
+	return nil
 }

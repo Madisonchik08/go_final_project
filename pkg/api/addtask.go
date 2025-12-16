@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -39,7 +38,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, map[string]any{"id": fmt.Sprint(id)})
+	writeJSON(w, map[string]any{"id": strconv.FormatInt(id, 10)})
 }
 
 func checkDate(task *db.Task, now time.Time) error {

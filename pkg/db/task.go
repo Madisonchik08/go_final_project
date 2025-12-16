@@ -71,7 +71,7 @@ func Tasks(limit int, search string) ([]*Task, error) {
 }
 
 // GetTask returns task by id.
-func GetTask(id string) (*Task, error) {
+func GetTask(id int) (*Task, error) {
 	var t Task
 	err := DB.QueryRow(`SELECT id, date, title, comment, repeat FROM scheduler WHERE id = ?`, id).
 		Scan(&t.ID, &t.Date, &t.Title, &t.Comment, &t.Repeat)

@@ -18,7 +18,7 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func writeJSON(w http.ResponseWriter, data any) {
+func writeJSON(w http.ResponseWriter, data map[string]any) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	_ = json.NewEncoder(w).Encode(data)
 }

@@ -3,6 +3,7 @@ package db
 import "database/sql"
 
 // DeleteTask removes a task by its ID.
+// DeleteTask удаляет задачу по её ID.
 func DeleteTask(id int) error {
 	res, err := DB.Exec(`DELETE FROM scheduler WHERE id = ?`, id)
 	if err != nil {
@@ -19,6 +20,7 @@ func DeleteTask(id int) error {
 }
 
 // UpdateDate updates the date of a task by its ID.
+// UpdateDate обновляет дату задачи по её ID.
 func UpdateDate(id int, date string) error {
 	res, err := DB.Exec(`UPDATE scheduler SET date = ? WHERE id = ?`, date, id)
 	if err != nil {

@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+// taskHandler routes task requests based on HTTP method.
+// taskHandler маршрутизирует запросы к задачам в зависимости от HTTP метода.
 func taskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
@@ -13,12 +15,16 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		getTaskHandler(w, r)
 	case http.MethodPut:
 		editTaskHandler(w, r)
+	case http.MethodDelete:
+		deleteTaskHandler(w, r)
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	}
 }
 
-func writeJSON(w http.ResponseWriter, data map[string]any) {
+// writeJSON writes JSON response to the client.
+// writeJSON записывает JSON ответ клиенту.
+func writeJSON(w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	_ = json.NewEncoder(w).Encode(data)
 }

@@ -12,6 +12,10 @@ import (
 // now     - current reference time
 // dstart  - base date in format 20060102
 // repeat  - repetition rule (d, y, w, m formats)
+// NextDate вычисляет следующую дату согласно правилам повторения.
+// now     - текущее опорное время
+// dstart  - базовая дата в формате 20060102
+// repeat  - правило повторения (форматы d, y, w, m)
 func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	repeat = strings.TrimSpace(repeat)
 	if repeat == "" {
@@ -96,14 +100,20 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	}
 }
 
+// normalize removes time component, keeping only date.
+// normalize удаляет компонент времени, оставляя только дату.
 func normalize(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }
 
+// afterNow checks if date is after now.
+// afterNow проверяет, что дата позже текущей.
 func afterNow(date, now time.Time) bool {
 	return date.After(now)
 }
 
+// advanceByDays advances date by specified interval in days.
+// advanceByDays продвигает дату на указанный интервал в днях.
 func advanceByDays(date, now time.Time, interval int) time.Time {
 	d := date.AddDate(0, 0, interval)
 	for !afterNow(d, now) {
@@ -112,6 +122,8 @@ func advanceByDays(date, now time.Time, interval int) time.Time {
 	return d
 }
 
+// advanceByYear advances date by one year.
+// advanceByYear продвигает дату на один год.
 func advanceByYear(date, now time.Time) time.Time {
 	d := addOneYear(date)
 	for !afterNow(d, now) {
@@ -120,15 +132,20 @@ func advanceByYear(date, now time.Time) time.Time {
 	return d
 }
 
+// addOneYear adds one year to the date, handling leap year edge cases.
+// addOneYear добавляет один год к дате, обрабатывая крайние случаи високосных годов.
 func addOneYear(t time.Time) time.Time {
 	d := t.AddDate(1, 0, 0)
 	// Adjust Feb 29 to Mar 1 on non-leap years.
+	// Корректируем 29 февраля на 1 марта в невисокосные годы.
 	if t.Month() == time.February && t.Day() == 29 && d.Month() == time.February && d.Day() == 28 {
 		return d.AddDate(0, 0, 1)
 	}
 	return d
 }
 
+// findNextMatching finds next date that matches the condition.
+// findNextMatching находит следующую дату, соответствующую условию.
 func findNextMatching(date, now time.Time, match func(time.Time) bool) time.Time {
 	d := date.AddDate(0, 0, 1)
 	for {
@@ -139,6 +156,8 @@ func findNextMatching(date, now time.Time, match func(time.Time) bool) time.Time
 	}
 }
 
+// parseWeekdays parses weekday numbers from string (1-7, comma-separated).
+// parseWeekdays парсит номера дней недели из строки (1-7, разделенные запятыми).
 func parseWeekdays(s string) ([8]bool, error) {
 	var days [8]bool
 	items := strings.Split(s, ",")
@@ -155,6 +174,8 @@ func parseWeekdays(s string) ([8]bool, error) {
 	return days, nil
 }
 
+// parseMonthDays parses day numbers from string (1-31, -1, -2, comma-separated).
+// parseMonthDays парсит номера дней месяца из строки (1-31, -1, -2, разделенные запятыми).
 func parseMonthDays(s string) (map[int]bool, error) {
 	m := make(map[int]bool)
 	items := strings.Split(s, ",")
@@ -175,6 +196,8 @@ func parseMonthDays(s string) (map[int]bool, error) {
 	return m, nil
 }
 
+// parseMonths parses month numbers from string (1-12, comma-separated).
+// parseMonths парсит номера месяцев из строки (1-12, разделенные запятыми).
 func parseMonths(s string) ([13]bool, error) {
 	var months [13]bool
 	items := strings.Split(s, ",")
@@ -191,6 +214,8 @@ func parseMonths(s string) ([13]bool, error) {
 	return months, nil
 }
 
+// matchMonthDay checks if date matches any of the specified month days.
+// matchMonthDay проверяет, соответствует ли дата одному из указанных дней месяца.
 func matchMonthDay(t time.Time, days map[int]bool) bool {
 	day := t.Day()
 	last := lastDayOfMonth(t)
@@ -206,6 +231,8 @@ func matchMonthDay(t time.Time, days map[int]bool) bool {
 	return false
 }
 
+// lastDayOfMonth returns the last day number of the month.
+// lastDayOfMonth возвращает номер последнего дня месяца.
 func lastDayOfMonth(t time.Time) int {
 	return time.Date(t.Year(), t.Month()+1, 0, 0, 0, 0, 0, time.UTC).Day()
 }

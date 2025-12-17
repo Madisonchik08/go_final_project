@@ -9,6 +9,8 @@ import (
 	"go_final_project/pkg/db"
 )
 
+// editTaskHandler handles PUT request to update an existing task.
+// editTaskHandler обрабатывает PUT запрос для обновления существующей задачи.
 func editTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {

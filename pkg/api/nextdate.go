@@ -7,6 +7,8 @@ import (
 	"go_final_project/pkg/nextdate"
 )
 
+// nextDateHandler handles GET request to calculate next date based on repeat rule.
+// nextDateHandler обрабатывает GET запрос для вычисления следующей даты на основе правила повторения.
 func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 	nowStr := r.FormValue("now")
 	date := r.FormValue("date")

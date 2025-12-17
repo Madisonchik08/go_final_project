@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -10,6 +11,8 @@ import (
 	"go_final_project/pkg/nextdate"
 )
 
+// addTaskHandler handles POST request to create a new task.
+// addTaskHandler обрабатывает POST запрос для создания новой задачи.
 func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
@@ -41,6 +44,8 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, map[string]any{"id": strconv.FormatInt(id, 10)})
 }
 
+// checkDate validates and adjusts task date based on repeat rules.
+// checkDate проверяет и корректирует дату задачи на основе правил повторения.
 func checkDate(task *db.Task, now time.Time) error {
 	if task.Date == "" {
 		task.Date = now.Format(DateLayout)
@@ -60,7 +65,8 @@ func checkDate(task *db.Task, now time.Time) error {
 		}
 	}
 
-	// if task date is before today, adjust based on repeat
+	// If task date is before today, adjust based on repeat
+	// Если дата задачи раньше сегодняшней, корректируем на основе повторения
 	if t.Before(now) {
 		if task.Repeat == "" {
 			task.Date = now.Format(DateLayout)
@@ -71,6 +77,8 @@ func checkDate(task *db.Task, now time.Time) error {
 	return nil
 }
 
+// normalizeDate removes time component, keeping only date.
+// normalizeDate удаляет компонент времени, оставляя только дату.
 func normalizeDate(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }

@@ -1,66 +1,68 @@
-FROM ubuntu:latest
+# Build stage - сборка приложения
+FROM golang:1.23-alpine AS builder
 
-# Установка зависимостей
-RUN apt-get update && apt-get install -y \
-    wget \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
-# Установка Go
-ENV GOLANG_VERSION 1.24.3
-RUN wget -qO- "https://golang.org/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz" | tar -C /usr/local -xzf -
-
-# Настройка переменных окружения
-ENV PATH="/usr/local/go/bin:${PATH}"
-ENV GOPATH="/go"
-ENV PATH="${GOPATH}/bin:${PATH}"
-
-# Создание рабочей директории
+# Set working directory
+# Установка рабочей директории
 WORKDIR /app
 
-# Копирование исходного кода
+# Copy go mod files
+# Копирование файлов go mod
 COPY go.mod go.sum ./
 
+# Download dependencies
 # Скачивание зависимостей
 RUN go mod download
 
-# Копирование остальных файлов
+# Copy source code
+# Копирование исходного кода
 COPY . .
 
-# Установка SQLite драйвера
-RUN go get modernc.org/sqlite
-
+# Build application
 # Сборка приложения
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
-# Создание минимального образа
+# Runtime stage - финальный образ
 FROM ubuntu:latest
 
+# Install ca-certificates for HTTPS
 # Установка ca-certificates для работы с HTTPS
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Создание пользователя
-RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
+# Create app user
+# Создание пользователя приложения
+RUN useradd -m appuser || true
 
-# Копирование бинарника из предыдущего этапа
-COPY --from=0 /app/main .
+# Set working directory
+# Установка рабочей директории
+WORKDIR /app
 
+# Copy binary from builder
+# Копирование бинарника из стадии сборки
+COPY --from=builder /app/main .
+
+# Copy web interface
 # Копирование веб-интерфейса
-COPY --from=0 /app/web ./web
+COPY --from=builder /app/web ./web
 
+# Set permissions
 # Установка прав доступа
-RUN chmod +x main
+RUN chmod +x main && chown -R appuser:appuser /app
 
+# Switch to non-privileged user
 # Переключение на непривилегированного пользователя
 USER appuser
 
+# Set default environment variables
 # Установка переменных окружения по умолчанию
 ENV TODO_PORT=7540
 ENV TODO_DBFILE=scheduler.db
-ENV TODO_PASSWORD=12345
+# TODO_PASSWORD should be set when running container
+# TODO_PASSWORD должен быть установлен при запуске контейнера
 
+# Expose port
 # Открытие порта
 EXPOSE 7540
 
+# Run application
 # Запуск приложения
 CMD ["./main"]

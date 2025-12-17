@@ -8,6 +8,7 @@ import (
 )
 
 // Task represents a scheduler record.
+// Task представляет запись планировщика.
 type Task struct {
 	ID      int64  `db:"id" json:"id,string"`
 	Date    string `db:"date" json:"date"`
@@ -17,6 +18,7 @@ type Task struct {
 }
 
 // AddTask inserts a new task into scheduler table and returns its ID.
+// AddTask вставляет новую задачу в таблицу планировщика и возвращает её ID.
 func AddTask(task *Task) (int64, error) {
 	query := `INSERT INTO scheduler (date, title, comment, repeat) VALUES (?, ?, ?, ?)`
 	res, err := DB.Exec(query, task.Date, task.Title, task.Comment, task.Repeat)
@@ -28,6 +30,8 @@ func AddTask(task *Task) (int64, error) {
 
 // Tasks returns up to limit tasks ordered by date ascending.
 // If search is provided, filters by date (dd.mm.yyyy) or substring in title/comment.
+// Tasks возвращает до limit задач, отсортированных по дате по возрастанию.
+// Если указан search, фильтрует по дате (dd.mm.yyyy) или подстроке в title/comment.
 func Tasks(limit int, search string) ([]*Task, error) {
 	if limit <= 0 {
 		limit = 50
@@ -71,6 +75,7 @@ func Tasks(limit int, search string) ([]*Task, error) {
 }
 
 // GetTask returns task by id.
+// GetTask возвращает задачу по id.
 func GetTask(id int) (*Task, error) {
 	var t Task
 	err := DB.QueryRow(`SELECT id, date, title, comment, repeat FROM scheduler WHERE id = ?`, id).
@@ -82,6 +87,7 @@ func GetTask(id int) (*Task, error) {
 }
 
 // UpdateTask updates task fields by id.
+// UpdateTask обновляет поля задачи по id.
 func UpdateTask(task *Task) error {
 	query := `UPDATE scheduler SET date = ?, title = ?, comment = ?, repeat = ? WHERE id = ?`
 	res, err := DB.Exec(query, task.Date, task.Title, task.Comment, task.Repeat, task.ID)

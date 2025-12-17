@@ -16,6 +16,8 @@ const (
 	webDir      = "web"
 )
 
+// resolvePort returns port number from environment variable or default.
+// resolvePort возвращает номер порта из переменной окружения или значение по умолчанию.
 func resolvePort() int {
 	envPort := os.Getenv("TODO_PORT")
 	if envPort == "" {
@@ -28,6 +30,8 @@ func resolvePort() int {
 	return port
 }
 
+// resolveWebDir returns absolute path to web directory.
+// resolveWebDir возвращает абсолютный путь к директории web.
 func resolveWebDir() string {
 	dir, err := filepath.Abs(webDir)
 	if err != nil {
@@ -37,6 +41,7 @@ func resolveWebDir() string {
 }
 
 // Start launches HTTP server that serves files from web directory.
+// Start запускает HTTP сервер, который обслуживает файлы из директории web.
 func Start() error {
 	dir := resolveWebDir()
 

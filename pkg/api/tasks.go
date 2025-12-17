@@ -6,10 +6,14 @@ import (
 	"go_final_project/pkg/db"
 )
 
+// tasksResp represents response with list of tasks.
+// tasksResp представляет ответ со списком задач.
 type tasksResp struct {
 	Tasks []*db.Task `json:"tasks"`
 }
 
+// tasksHandler handles GET request to retrieve list of tasks.
+// tasksHandler обрабатывает GET запрос для получения списка задач.
 func tasksHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)

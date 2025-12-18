@@ -27,7 +27,7 @@ func AddTask(task *Task) (int64, error) {
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
-		return 0, fmt.Errorf("failed to get last insert id: %w", err)
+		return 0, fmt.Errorf("could not get last inserted id: %w", err)
 	}
 	return id, nil
 }

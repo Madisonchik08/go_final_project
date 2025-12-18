@@ -16,7 +16,7 @@ import (
 func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
-		writeJSON(w, map[string]any{"error": err.Error()})
+		writeJSON(w, map[string]any{"error": err.Error()}, http.StatusBadRequest)
 		return
 	}
 
@@ -25,23 +25,23 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	task.Repeat = strings.TrimSpace(task.Repeat)
 
 	if task.Title == "" {
-		writeJSON(w, map[string]any{"error": "title is required"})
+		writeJSON(w, map[string]any{"error": "title is required"}, http.StatusBadRequest)
 		return
 	}
 
 	now := normalizeDate(time.Now())
 	if err := checkDate(&task, now); err != nil {
-		writeJSON(w, map[string]any{"error": err.Error()})
+		writeJSON(w, map[string]any{"error": err.Error()}, http.StatusBadRequest)
 		return
 	}
 
 	id, err := db.AddTask(&task)
 	if err != nil {
-		writeJSON(w, map[string]any{"error": err.Error()})
+		writeJSON(w, map[string]any{"error": err.Error()}, http.StatusInternalServerError)
 		return
 	}
 
-	writeJSON(w, map[string]any{"id": strconv.FormatInt(id, 10)})
+	writeJSON(w, map[string]any{"id": strconv.FormatInt(id, 10)}, http.StatusOK)
 }
 
 // checkDate validates and adjusts task date based on repeat rules.

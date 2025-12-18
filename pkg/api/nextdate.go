@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -21,16 +22,18 @@ func nextDateHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		now, err = time.Parse(DateLayout, nowStr)
 		if err != nil {
-			writeJSON(w, map[string]any{"error": "invalid now parameter"})
+			writeJSON(w, map[string]any{"error": "invalid now parameter"}, http.StatusBadRequest)
 			return
 		}
 	}
 
 	res, err := nextdate.NextDate(now, date, repeat)
 	if err != nil {
-		writeJSON(w, map[string]any{"error": err.Error()})
+		writeJSON(w, map[string]any{"error": err.Error()}, http.StatusBadRequest)
 		return
 	}
 
-	_, _ = w.Write([]byte(res))
+	if _, err := w.Write([]byte(res)); err != nil {
+		log.Printf("Error writing response: %v", err)
+	}
 }

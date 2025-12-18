@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -24,22 +25,22 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
-		writeJSON(w, map[string]any{"error": "id is required"})
+		writeJSON(w, map[string]any{"error": "id is required"}, http.StatusBadRequest)
 		return
 	}
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		writeJSON(w, map[string]any{"error": "invalid id"})
+		writeJSON(w, map[string]any{"error": "invalid id"}, http.StatusBadRequest)
 		return
 	}
 
 	task, err := db.GetTask(id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			writeJSON(w, map[string]any{"error": "task not found"})
+		if errors.Is(err, sql.ErrNoRows) {
+			writeJSON(w, map[string]any{"error": "task not found"}, http.StatusNotFound)
 		} else {
-			writeJSON(w, map[string]any{"error": "database error"})
+			writeJSON(w, map[string]any{"error": "database error"}, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -50,22 +51,22 @@ func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if repeat == "" {
 		err = db.DeleteTask(id)
 		if err != nil {
-			writeJSON(w, map[string]any{"error": "failed to delete task"})
+			writeJSON(w, map[string]any{"error": "failed to delete task"}, http.StatusInternalServerError)
 			return
 		}
 	} else {
 		now := time.Now()
 		nextDate, err := nextdate.NextDate(now, date, repeat)
 		if err != nil {
-			writeJSON(w, map[string]any{"error": "failed to calculate next date"})
+			writeJSON(w, map[string]any{"error": "failed to calculate next date"}, http.StatusBadRequest)
 			return
 		}
 		err = db.UpdateDate(id, nextDate)
 		if err != nil {
-			writeJSON(w, map[string]any{"error": "failed to update task date"})
+			writeJSON(w, map[string]any{"error": "failed to update task date"}, http.StatusInternalServerError)
 			return
 		}
 	}
 
-	writeJSON(w, map[string]any{})
+	writeJSON(w, map[string]any{}, http.StatusOK)
 }

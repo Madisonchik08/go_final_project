@@ -17,21 +17,21 @@ func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
-		writeJSON(w, map[string]any{"error": "id is required"})
+		writeJSON(w, map[string]any{"error": "id is required"}, http.StatusBadRequest)
 		return
 	}
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		writeJSON(w, map[string]any{"error": "id is invalid"})
+		writeJSON(w, map[string]any{"error": "id is invalid"}, http.StatusBadRequest)
 		return
 	}
 
 	err = db.DeleteTask(id)
 	if err != nil {
-		writeJSON(w, map[string]any{"error": "failed to delete task"})
+		writeJSON(w, map[string]any{"error": "failed to delete task"}, http.StatusNotFound)
 		return
 	}
 
-	writeJSON(w, map[string]any{})
+	writeJSON(w, map[string]any{}, http.StatusOK)
 }

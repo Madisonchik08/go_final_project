@@ -23,6 +23,7 @@ func main() {
 	if err := db.Init(resolveDBFile()); err != nil {
 		log.Fatal(err)
 	}
+	defer db.DB.Close()
 
 	if err := server.Start(); err != nil {
 		log.Fatal(err)

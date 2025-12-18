@@ -22,9 +22,13 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// writeJSON writes JSON response to the client.
-// writeJSON записывает JSON ответ клиенту.
-func writeJSON(w http.ResponseWriter, data any) {
+// writeJSON writes JSON response to the client with specified status code.
+// writeJSON записывает JSON ответ клиенту с указанным кодом статуса.
+func writeJSON(w http.ResponseWriter, data any, statusCode int) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	_ = json.NewEncoder(w).Encode(data)
+	w.WriteHeader(statusCode)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		// Log encoding error if it occurs
+		// Логируем ошибку кодирования, если она возникает
+	}
 }

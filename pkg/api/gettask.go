@@ -12,20 +12,20 @@ import (
 func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
-		writeJSON(w, map[string]any{"error": "id is required"})
+		writeJSON(w, map[string]any{"error": "id is required"}, http.StatusBadRequest)
 		return
 	}
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		writeJSON(w, map[string]any{"error": "invalid id"})
+		writeJSON(w, map[string]any{"error": "invalid id"}, http.StatusBadRequest)
 		return
 	}
 
 	task, err := db.GetTask(id)
 	if err != nil {
-		writeJSON(w, map[string]any{"error": err.Error()})
+		writeJSON(w, map[string]any{"error": err.Error()}, http.StatusNotFound)
 		return
 	}
-	writeJSON(w, task)
+	writeJSON(w, task, http.StatusOK)
 }

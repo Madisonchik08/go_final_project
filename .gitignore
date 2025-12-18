@@ -1,0 +1,40 @@
+# Binaries / Исполняемые файлы
+*.exe
+*.test.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary / Тестовые бинарники
+*.test
+
+# Database files / Файлы базы данных
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment files / Файлы окружения
+TODO_PASSWORD=*
+.env
+.env.local
+
+# IDE files / Файлы IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files / Системные файлы
+.DS_Store
+Thumbs.db
+
+# Build artifacts / Артефакты сборки
+/bin/
+/dist/
+/build/
+
+# Temporary files / Временные файлы
+*.tmp
+*.log
+

@@ -1,0 +1,23 @@
+# Ignore test files
+# Игнорировать тестовые файлы
+tests/
+*.test.exe
+*.exe
+
+# Ignore database files
+# Игнорировать файлы базы данных
+*.db
+
+# Ignore git files
+# Игнорировать файлы git
+.git
+.gitignore
+
+# Ignore documentation
+# Игнорировать документацию
+README.md
+
+# Ignore temporary files
+# Игнорировать временные файлы
+TODO_PASSWORD=*
+
